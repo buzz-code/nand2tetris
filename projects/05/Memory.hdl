@@ -27,5 +27,15 @@ CHIP Memory {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+	Not(in=address[14], out=isData);
+	And(a=address[14], b=address[13], out=isKbd);
+	Or(a=isData, b=isKbd, out=isNotScrn);
+	Not(in=isNotScrn, out=isScrn);
+	And(a=load, b=isData, out=loadData);
+	And(a=load, b=isScrn, out=loadScrn);
+	RAM16K(in=in ,load=loadData ,address=address[0..13] ,out=outData);
+	Screen(in=in ,load=loadScrn ,address=address[0..12] ,out=outScrn);
+	Keyboard(out=outKbd);
+	Mux16(a=outScrn, b=outData, sel=isData, out=outDataScrn);
+	Mux16(a=outDataScrn, b=outKbd, sel=isKbd, out=out);
 }
