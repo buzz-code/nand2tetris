@@ -1,20 +1,32 @@
 // This file is part of www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
-// File name: projects/01/DMux8Way.hdl
-
+// File name: projects/1/DMux8Way.hdl
 /**
  * 8-way demultiplexor:
- * {a, b, c, d, e, f, g, h} = {in, 0, 0, 0, 0, 0, 0, 0} if sel == 000
- *                            {0, in, 0, 0, 0, 0, 0, 0} if sel == 001
- *                            etc.
- *                            {0, 0, 0, 0, 0, 0, 0, in} if sel == 111
+ * [a, b, c, d, e, f, g, h] = [in, 0,  0,  0,  0,  0,  0,  0] if sel = 000
+ *                            [0, in,  0,  0,  0,  0,  0,  0] if sel = 001
+ *                            [0,  0, in,  0,  0,  0,  0,  0] if sel = 010
+ *                            [0,  0,  0, in,  0,  0,  0,  0] if sel = 011
+ *                            [0,  0,  0,  0, in,  0,  0,  0] if sel = 100
+ *                            [0,  0,  0,  0,  0, in,  0,  0] if sel = 101
+ *                            [0,  0,  0,  0,  0,  0, in,  0] if sel = 110
+ *                            [0,  0,  0,  0,  0,  0,  0, in] if sel = 111
  */
-
 CHIP DMux8Way {
     IN in, sel[3];
     OUT a, b, c, d, e, f, g, h;
 
     PARTS:
-    // Put your code here:
+    DMux4Way(in= in, sel= sel[0..1], a= aIfSelZero, b= bIfSelZero, c= cIfSelZero, d= dIfSelZero);
+    DMux4Way(in= in, sel= sel[0..1], a= eIfSelOne, b= fIfSelOne, c= gIfSelOne, d= hIfSelOne);
+    Not(in= sel[2], out= notSel2);
+    And(a= aIfSelZero, b= notSel2, out= a);
+    And(a= bIfSelZero, b= notSel2, out= b);
+    And(a= cIfSelZero, b= notSel2, out= c);
+    And(a= dIfSelZero, b= notSel2, out= d);
+    And(a= eIfSelOne, b= sel[2], out= e);
+    And(a= fIfSelOne, b= sel[2], out= f);
+    And(a= gIfSelOne, b= sel[2], out= g);
+    And(a= hIfSelOne, b= sel[2], out= h);
 }
