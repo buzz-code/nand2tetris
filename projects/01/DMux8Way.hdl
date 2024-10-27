@@ -18,19 +18,14 @@ CHIP DMux8Way {
     OUT a, b, c, d, e, f, g, h;
 
     PARTS:
-    DMux(in= in, sel= sel[0], a= aDMuxSel0, b= bDMuxSel0);
-    DMux(in= in, sel= sel[1], a= aDMuxSel1, b= bDMuxSel1);
+    DMux4Way(in= in, sel= sel[0..1], a= aDMuxSel01, b= bDMuxSel01, c= cDMuxSel01, d= dDMuxSel01);
     DMux(in= in, sel= sel[2], a= aDMuxSel2, b= bDMuxSel2);
-    And(a= aDMuxSel0, b= aDMuxSel1, out= dMuxAA);
-    And(a= aDMuxSel0, b= bDMuxSel1, out= dMuxAB);
-    And(a= bDMuxSel0, b= aDMuxSel1, out= dMuxBA);
-    And(a= bDMuxSel0, b= bDMuxSel1, out= dMuxBB);
-    And(a= dMuxAA, b= aDMuxSel2, out= a);
-    And(a= dMuxAA, b= bDMuxSel2, out= e);
-    And(a= dMuxBA, b= aDMuxSel2, out= b);
-    And(a= dMuxBA, b= bDMuxSel2, out= f);
-    And(a= dMuxAB, b= aDMuxSel2, out= c);
-    And(a= dMuxAB, b= bDMuxSel2, out= g);
-    And(a= dMuxBB, b= aDMuxSel2, out= d);
-    And(a= dMuxBB, b= bDMuxSel2, out= h);
+    And(a= aDMuxSel01, b= aDMuxSel2, out= a);
+    And(a= bDMuxSel01, b= aDMuxSel2, out= b);
+    And(a= cDMuxSel01, b= aDMuxSel2, out= c);
+    And(a= dDMuxSel01, b= aDMuxSel2, out= d);
+    And(a= aDMuxSel01, b= bDMuxSel2, out= e);
+    And(a= bDMuxSel01, b= bDMuxSel2, out= f);
+    And(a= cDMuxSel01, b= bDMuxSel2, out= g);
+    And(a= dDMuxSel01, b= bDMuxSel2, out= h);
 }
