@@ -209,19 +209,22 @@ class CodeWriter:
             "@LCL",
             "M=D",
             
-            f"@{5 + num_args}"
+            f"@{5 + num_args}",
             "D=D-A",
             "@ARG",
             "M=D"
         ])
         
-        self.write_goto(function_name)
-        self.write_label(return_address)
+        self._write_to_file([
+            f"@{function_name}",
+            "0;JMP",
+            f"({return_address})"
+        ])
 
     def write_function(self, function_name, num_locals):
         self.function_name = function_name
         self._write_to_file([f"// function {function_name} {num_locals}"])
-        self.write_label(function_name)
+        self._write_to_file([f"({function_name})"])
         
         for i in range(num_locals):
             self.write_push_pop("push", "constant", 0)
