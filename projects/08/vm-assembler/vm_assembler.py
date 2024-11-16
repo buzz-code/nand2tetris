@@ -17,6 +17,12 @@ class VmAssembler:
                     self.code_writer.write_arithmetic(parser.get_arg1())
                 elif command_type in ["push", "pop"]:
                     self.code_writer.write_push_pop(command_type, parser.get_arg1(), parser.get_arg2())
+                elif command_type == "label":
+                    self.code_writer.write_label(parser.get_arg1())
+                elif command_type == "goto":
+                    self.code_writer.write_goto(parser.get_arg1())
+                elif command_type == "if-goto":
+                    self.code_writer.write_if_goto(parser.get_arg1())
         self.code_writer.close()
 
 

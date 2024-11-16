@@ -16,9 +16,12 @@ class Parser:
             self.command_type = command
             self.arg1 = parts[1]
             self.arg2 = int(parts[2])
-        else:
+        elif command in ["add", "sub", "neg", "eq", "gt", "lt", "and", "or", "not"]:
             self.command_type = "arithmetic"
             self.arg1 = command
+        elif command in ["label", "goto", "if-goto"]:
+            self.command_type = command
+            self.arg1 = parts[1]
 
     def get_command_type(self):
         return self.command_type

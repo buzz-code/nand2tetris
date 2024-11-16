@@ -151,6 +151,22 @@ class CodeWriter:
                 ])
         self._write_to_file(asm_commands)
 
+    def write_label(self, label):
+        self._write_to_file([f"({label})"])
+
+    def write_goto(self, label):
+        self._write_to_file([f"@{label}", "0;JMP"])
+
+    def write_if_goto(self, label):
+        self._write_to_file([
+            "@SP",
+            "AM=M-1",
+            "D=M",
+            f"@{label}",
+            "D;JNE"
+        ])
+
+
     def _generate_comparison(self, jump_command):
         label_true = f"TRUE_{self.label_counter}"
         label_end = f"END_{self.label_counter}"
@@ -180,12 +196,8 @@ class CodeWriter:
             self.file.write(command + '\n')
 
     def close(self):
-        asm_commands = [
-            "(END)",
-            "@END",
-            "0;JMP"
-        ]
-        self._write_to_file(asm_commands)
+        self.write_label("END")
+        self.write_goto("END")
         self.file.close()
 
 # Example usage:

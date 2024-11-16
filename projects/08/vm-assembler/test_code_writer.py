@@ -142,6 +142,41 @@ class TestCodeWriter(unittest.TestCase):
             "M=M+1\n"
         ]
         self.assertLinesEqual(lines, expected_lines)
+        
+    def test_write_label(self):
+        self.writer.write_label("LOOP")
+        self.writer.close()
+        with open(self.test_file, 'r') as file:
+            lines = file.readlines()
+        expected_lines = [
+            "(LOOP)\n"
+        ]
+        self.assertLinesEqual(lines, expected_lines)
+        
+    def test_write_goto(self):
+        self.writer.write_goto("LOOP")
+        self.writer.close()
+        with open(self.test_file, 'r') as file:
+            lines = file.readlines()
+        expected_lines = [
+            "@LOOP\n",
+            "0;JMP\n"
+        ]
+        self.assertLinesEqual(lines, expected_lines)
+        
+    def test_write_if(self):
+        self.writer.write_if_goto("LOOP")
+        self.writer.close()
+        with open(self.test_file, 'r') as file:
+            lines = file.readlines()
+        expected_lines = [
+            "@SP\n",
+            "AM=M-1\n",
+            "D=M\n",
+            "@LOOP\n",
+            "D;JNE\n"
+        ]
+        self.assertLinesEqual(lines, expected_lines)
 
 if __name__ == '__main__':
     unittest.main()
