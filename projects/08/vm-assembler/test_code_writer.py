@@ -6,6 +6,7 @@ class TestCodeWriter(unittest.TestCase):
     def setUp(self):
         self.test_file = "./test_output.asm"
         self.writer = CodeWriter(self.test_file)
+        self.writer.function_name = "test"
 
     def tearDown(self):
         if os.path.exists(self.test_file):
@@ -13,8 +14,8 @@ class TestCodeWriter(unittest.TestCase):
             
     def assertLinesEqual(self, lines, expected_lines):
         expected_lines.extend([
-            "(END)\n",
-            "@END\n",
+            "(test$END)\n",
+            "@test$END\n",
             "0;JMP\n"
         ])
         self.assertEqual(lines, expected_lines)
@@ -149,7 +150,7 @@ class TestCodeWriter(unittest.TestCase):
         with open(self.test_file, 'r') as file:
             lines = file.readlines()
         expected_lines = [
-            "(LOOP)\n"
+            "(test$LOOP)\n"
         ]
         self.assertLinesEqual(lines, expected_lines)
         
@@ -159,7 +160,7 @@ class TestCodeWriter(unittest.TestCase):
         with open(self.test_file, 'r') as file:
             lines = file.readlines()
         expected_lines = [
-            "@LOOP\n",
+            "@test$LOOP\n",
             "0;JMP\n"
         ]
         self.assertLinesEqual(lines, expected_lines)
@@ -173,7 +174,7 @@ class TestCodeWriter(unittest.TestCase):
             "@SP\n",
             "AM=M-1\n",
             "D=M\n",
-            "@LOOP\n",
+            "@test$LOOP\n",
             "D;JNE\n"
         ]
         self.assertLinesEqual(lines, expected_lines)

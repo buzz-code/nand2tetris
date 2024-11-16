@@ -15,6 +15,20 @@ class CodeWriter:
         self.label_counter = 0
         self.file_name = output_file.split('/')[-1].split('.')[0]
         self.return_index = 0
+        self.function_name = ""
+    
+    def set_file_name(self, file_name):
+        self.file_name = file_name
+    
+    def init(self):
+        self.function_name = "bootstrap"
+        self._write_to_file([
+            "@256",
+            "D=A",
+            "@SP",
+            "M=D"
+        ])
+        self.write_call("Sys.init", 0)
 
     def write_arithmetic(self, command):
         asm_commands = []
@@ -153,17 +167,22 @@ class CodeWriter:
         self._write_to_file(asm_commands)
 
     def write_label(self, label):
-        self._write_to_file([f"({label})"])
+        self._write_to_file([
+            f"({self.function_name}${label})"
+        ])
 
     def write_goto(self, label):
-        self._write_to_file([f"@{label}", "0;JMP"])
+        self._write_to_file([
+            f"@{self.function_name}${label}",
+            "0;JMP"
+        ])
 
     def write_if_goto(self, label):
         self._write_to_file([
             "@SP",
             "AM=M-1",
             "D=M",
-            f"@{label}",
+            f"@{self.function_name}${label}",
             "D;JNE"
         ])
 
@@ -200,6 +219,7 @@ class CodeWriter:
         self.write_label(return_address)
 
     def write_function(self, function_name, num_locals):
+        self.function_name = function_name
         self._write_to_file([f"// function {function_name} {num_locals}"])
         self.write_label(function_name)
         
@@ -278,7 +298,7 @@ class CodeWriter:
 
     def _return_address(self):
         self.return_index += 1
-        return f"return_address_{self.return_index}"
+        return f"{self.function_name}$ret.{self.return_index}"
         
     def close(self):
         self.write_label("END")
