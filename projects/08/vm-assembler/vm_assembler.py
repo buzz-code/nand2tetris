@@ -23,6 +23,12 @@ class VmAssembler:
                     self.code_writer.write_goto(parser.get_arg1())
                 elif command_type == "if-goto":
                     self.code_writer.write_if_goto(parser.get_arg1())
+                elif command_type == "function":
+                    self.code_writer.write_function(parser.get_arg1(), parser.get_arg2())
+                elif command_type == "call":
+                    self.code_writer.write_call(parser.get_arg1(), parser.get_arg2())
+                elif command_type == "return":
+                    self.code_writer.write_return()
         self.code_writer.close()
 
 

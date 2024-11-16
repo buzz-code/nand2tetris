@@ -22,6 +22,12 @@ class Parser:
         elif command in ["label", "goto", "if-goto"]:
             self.command_type = command
             self.arg1 = parts[1]
+        elif command in ["function", "call"]:
+            self.command_type = command
+            self.arg1 = parts[1]
+            self.arg2 = int(parts[2])
+        elif command == "return":
+            self.command_type = command
 
     def get_command_type(self):
         return self.command_type

@@ -14,6 +14,7 @@ class CodeWriter:
         self.file = open(output_file, 'w')
         self.label_counter = 0
         self.file_name = output_file.split('/')[-1].split('.')[0]
+        self.return_index = 0
 
     def write_arithmetic(self, command):
         asm_commands = []
@@ -116,12 +117,12 @@ class CodeWriter:
                     "D=M",
                     f"@{index}",
                     "D=D+A",
-                    "@R13",
+                    "@segment_pointer",
                     "M=D",
                     "@SP",
                     "AM=M-1",
                     "D=M",
-                    "@R13",
+                    "@segment_pointer",
                     "A=M",
                     "M=D"
                 ])
@@ -166,6 +167,86 @@ class CodeWriter:
             "D;JNE"
         ])
 
+    def write_call(self, function_name, num_args):
+        self._write_to_file([f"// call {function_name} {num_args}"])
+        return_address = self._return_address()
+        self.write_push_pop("push", "constant", return_address)
+        
+        pointers = ["LCL", "ARG", "THIS", "THAT"]
+        for pointer in pointers:
+            self._write_to_file([
+                f"@{pointer}",
+                "D=M",
+                "@SP",
+                "A=M",
+                "M=D",
+                "@SP",
+                "M=M+1"
+            ])
+            
+        self._write_to_file([
+            "@SP",
+            "D=M",
+            "@LCL",
+            "M=D",
+            
+            f"@{5 + num_args}"
+            "D=D-A",
+            "@ARG",
+            "M=D"
+        ])
+        
+        self.write_goto(function_name)
+        self.write_label(return_address)
+
+    def write_function(self, function_name, num_locals):
+        self._write_to_file([f"// function {function_name} {num_locals}"])
+        self.write_label(function_name)
+        
+        for i in range(num_locals):
+            self.write_push_pop("push", "constant", 0)
+            
+    def write_return(self):
+        self._write_to_file([
+            "// return",
+            "@LCL",
+            "D=M",
+            "@end_frame",
+            "M=D",
+            
+            "@5",
+            "A=D-A",
+            "D=M",
+            "@ret_addr",
+            "M=D"
+        ])
+        
+        self.write_push_pop("pop", "argument", 0)
+        
+        self._write_to_file([
+            "@ARG",
+            "D=M",
+            "@SP",
+            "M=D+1"
+        ])
+        
+        pointers = ["LCL", "ARG", "THIS", "THAT"]
+        pointers.reverse()
+        for pointer in pointers:
+            self._write_to_file([
+                "@end_frame",
+                "AM=M-1",
+                "D=M",
+                f"@{pointer}",
+                "M=D"
+            ])
+        
+        self._write_to_file([
+            "@ret_addr",
+            "A=M",
+            "0;JMP"
+        ])
+
 
     def _generate_comparison(self, jump_command):
         label_true = f"TRUE_{self.label_counter}"
@@ -195,6 +276,10 @@ class CodeWriter:
         for command in commands:
             self.file.write(command + '\n')
 
+    def _return_address(self):
+        self.return_index += 1
+        return f"return_address_{self.return_index}"
+        
     def close(self):
         self.write_label("END")
         self.write_goto("END")
